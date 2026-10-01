@@ -1,64 +1,40 @@
 package com.ubeyd.focusguard
 
-import android.content.Context
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import android.content.Intent
+import android.os.Bundle
+import android.provider.Settings
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 
-private val Context.focusGuardDataStore by preferencesDataStore(
-    name = "focus_guard_preferences"
-)
+class MainActivity : ComponentActivity() {
 
-class PreferencesManager(
-    private val context: Context
-) {
-
-    private object Keys {
-
-        val BLOCK_INSTAGRAM_REELS =
-            booleanPreferencesKey(
-                "block_instagram_reels"
-            )
-
-        val BLOCK_YOUTUBE_SHORTS =
-            booleanPreferencesKey(
-                "block_youtube_shorts"
-            )
-    }
-
-    val blockInstagramReels: Flow<Boolean> =
-        context.focusGuardDataStore.data.map { preferences ->
-            preferences[
-                Keys.BLOCK_INSTAGRAM_REELS
-            ] ?: true
-        }
-
-    val blockYouTubeShorts: Flow<Boolean> =
-        context.focusGuardDataStore.data.map { preferences ->
-            preferences[
-                Keys.BLOCK_YOUTUBE_SHORTS
-            ] ?: true
-        }
-
-    suspend fun setBlockInstagramReels(
-        enabled: Boolean
+    override fun onCreate(
+        savedInstanceState: Bundle?
     ) {
-        context.focusGuardDataStore.edit { preferences ->
-            preferences[
-                Keys.BLOCK_INSTAGRAM_REELS
-            ] = enabled
-        }
-    }
+        super.onCreate(savedInstanceState)
 
-    suspend fun setBlockYouTubeShorts(
-        enabled: Boolean
-    ) {
-        context.focusGuardDataStore.edit { preferences ->
-            preferences[
-                Keys.BLOCK_YOUTUBE_SHORTS
-            ] = enabled
+        enableEdgeToEdge()
+
+        setContent {
+
+            MaterialTheme {
+
+                Surface {
+
+                    MainScreen(
+                        onOpenAccessibilitySettings = {
+                            startActivity(
+                                Intent(
+                                    Settings.ACTION_ACCESSIBILITY_SETTINGS
+                                )
+                            )
+                        }
+                    )
+                }
+            }
         }
     }
 }
